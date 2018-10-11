@@ -1,0 +1,3 @@
+---
+- name: 'Push image'
+  command: "docker push {{ registry }}/{{ project }}/{{ image }}:latest"

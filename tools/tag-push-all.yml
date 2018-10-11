@@ -1,0 +1,17 @@
+---
+- import_playbook: tag-push.yml
+  vars:
+    images:
+      - foreman
+      - foreman-proxy
+      - dynflow
+      - pulp
+      - pulp-worker
+      - pulp-resource-manager
+      - pulp-celerybeat
+      - pulp-streamer
+      - qpid
+      - squid
+      - content-server
+      - candlepin
+      - certificates

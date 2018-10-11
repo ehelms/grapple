@@ -1,0 +1,8 @@
+---
+- import_playbook: build.yml
+  vars:
+    images:
+      - foreman
+      - foreman-proxy
+      - dynflow
+      - certificates
