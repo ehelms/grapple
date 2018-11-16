@@ -3,6 +3,7 @@
 import sys
 import socket
 import time
+import os
 
 if __name__ == '__main__':
 
@@ -13,7 +14,8 @@ if __name__ == '__main__':
     while not postgres_is_alive and tries < 200:
         tries += 1
         try:
-            s.connect(('postgres', 5432))
+            print("Checking postgres host %s" % os.environ['POSTGRES_SERVICE_HOST'])
+            s.connect((os.environ['POSTGRES_SERVICE_HOST'], 5432))
         except socket.error:
             time.sleep(3)
         else:
