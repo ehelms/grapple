@@ -9,4 +9,4 @@
   -c 1 \
   --umask=18 \
   --max-tasks-per-child=0 \
-  -n reserved_resource_worker-$(hostname)
+  -n reserved_resource_worker-$(hostname)-$PULP_WORKER_NUMBER

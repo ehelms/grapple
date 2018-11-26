@@ -1,6 +1,6 @@
 #!/bin/bash
 
-chown -R apache:root /var/lib/pulp
+#chown -R apache:root /var/lib/pulp
 
 /usr/bin/wait_on_mongodb.py
 

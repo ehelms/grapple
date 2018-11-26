@@ -1,6 +1,6 @@
 FROM centos:7
 
-COPY container-assets/pulp.repo /etc/yum.repos.d/pulp.repo
+#COPY container-assets/pulp.repo /etc/yum.repos.d/pulp.repo
 
 RUN echo "tsflags=nodocs" >> /etc/yum.conf && \
     yum -y install epel-release https://fedorapeople.org/groups/katello/releases/yum/nightly/katello/el7/x86_64/katello-repos-latest.rpm && \

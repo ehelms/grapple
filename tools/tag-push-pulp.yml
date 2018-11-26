@@ -1,0 +1,13 @@
+---
+- import_playbook: tag-push.yml
+  vars:
+    project: foreman
+    images:
+      - pulp
+      - pulp-worker
+      - pulp-resource-manager
+      - pulp-celerybeat
+      - pulp-streamer
+      - qpid
+      - squid
+      - content-server
