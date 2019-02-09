@@ -1,0 +1,8 @@
+---
+:katello:
+  :rest_client_timeout: 3600
+
+  :post_sync_url: "https://{{ ansible_fqdn }}/katello/api/v2/repositories/sync_complete?token={{ katello_sync_token }}"
+
+  :pulp:
+    :url: "{{ katello_pulp_url }}"

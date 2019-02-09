@@ -1,0 +1,4 @@
+---
+candlepin_postgresql_database: candlepin
+candlepin_postgresql_user: candlepin
+candlepin_postgresql_password: candlepin

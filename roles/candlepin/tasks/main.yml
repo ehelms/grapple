@@ -1,0 +1,95 @@
+---
+- name: 'Install Katello repos'
+  yum: name=https://fedorapeople.org/groups/katello/releases/yum/nightly/katello/el7/x86_64/katello-repos-latest.rpm
+
+- name: 'Install Candlepin'
+  yum: name=candlepin
+
+- name: 'Migrate Candlepin database'
+  command: >
+    liquibase
+    --driver=org.postgresql.Driver
+    --classpath=/usr/share/java/postgresql-jdbc.jar:/var/lib/tomcat/webapps/candlepin/WEB-INF/classes/
+    --changeLogFile=db/changelog/changelog-create.xml
+    --url=jdbc:postgresql:{{ candlepin_postgresql_database }}
+    --username={{ candlepin_postgresql_user }}
+    --password={{ candlepin_postgresql_password }}
+    migrate
+    -Dcommunity=False
+
+- name: 'Deploy Candlepin configuration file'
+  template:
+    src: candlepin.conf.j2
+    dest: /etc/candlepin/candlepin.conf
+    mode: 0640
+    owner: tomcat
+    group: tomcat
+
+- name: 'Create Candlepin client key'
+  command: >
+    openssl genrsa
+      -out "{{ foreman_ca_directory_keys }}/candlepin_client.key"
+  args:
+    creates: "{{ foreman_ca_directory_keys }}/candlepin_client.key"
+
+- name: 'Create Candlepin client signing request'
+  command: >
+    openssl req
+      -new
+      -config "{{ foreman_ca_directory }}/openssl.cnf"
+      -key "{{ foreman_ca_directory_keys }}/candlepin_client.key"
+      -out "{{ foreman_ca_directory_requests }}/candlepin_client.csr"
+  args:
+    creates: "{{ foreman_ca_directory_requests }}/candlepin_client.csr"
+
+- name: 'Create Candlepin client certificate'
+  command: >
+    openssl ca
+      -create_serial
+      -batch
+      -extensions ssl_client
+      -config "{{ foreman_ca_directory }}/openssl.cnf"
+      -in "{{ foreman_ca_directory_requests }}/candlepin_client.csr"
+      -out "{{ foreman_ca_directory_certs }}/candlepin_client.crt"
+  args:
+    creates: "{{ foreman_ca_directory_certs }}/candlepin_client.crt"
+
+- name: 'Generate Candlepin keystore'
+  command: >
+    openssl
+    pkcs12
+    -export
+    -in "{{ foreman_ca_directory_certs }}/root_ca.crt"
+    -inkey "{{ foreman_ca_directory_keys }}/root_ca.key"
+    -out "{{ candlepin_keystore }}"
+    -name tomcat
+    -CAfile "{{ foreman_ca_directory_certs }}/root_ca.crt"
+    -caname root
+    -password pass:"{{ candlepin_keystore_password }}"
+  args:
+    creates: "{{ candlepin_keystore }}"
+
+- name: 'Configure Tomcat'
+  template:
+    src: server.xml.j2
+    dest: /etc/tomcat/server.xml
+    mode: 0640
+    owner: tomcat
+    group: tomcat
+
+- name: 'Start Tomcat'
+  service:
+    name: tomcat
+    state: restarted
+
+- name: ''
+  command: >
+    wget
+    --no-proxy
+    --timeout=30
+    --tries=40
+    --wait=20
+    --retry-connrefused
+    -qO-
+    http://localhost:8080/candlepin/admin/init
+

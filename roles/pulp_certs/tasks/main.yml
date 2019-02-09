@@ -1,0 +1,62 @@
+---
+- name: 'Create server key'
+  command: >
+    openssl genrsa
+      -out "{{ foreman_ca_directory_keys }}/{{ pulp_hostname }}.key"
+  args:
+    creates: "{{ foreman_ca_directory_keys }}/{{ pulp_hostname }}.key"
+
+- name: 'Create server signing request'
+  command: >
+    openssl req
+      -new
+      -config "{{ foreman_ca_directory }}/openssl.cnf"
+      -key "{{ foreman_ca_directory_keys }}/{{ pulp_hostname }}.key"
+      -out "{{ foreman_ca_directory_requests }}/{{ pulp_hostname }}.csr"
+  args:
+    creates: "{{ foreman_ca_directory_requests }}/{{ pulp_hostname }}.csr"
+
+- name: 'Create server certificate'
+  command: >
+    openssl ca
+      -create_serial
+      -batch
+      -extensions ssl_server
+      -config "{{ foreman_ca_directory }}/openssl.cnf"
+      -in "{{ foreman_ca_directory_requests }}/{{ pulp_hostname }}.csr"
+      -out "{{ foreman_ca_directory_certs }}/{{ pulp_hostname }}.crt"
+  args:
+    creates: "{{ foreman_ca_directory_certs }}/{{ pulp_hostname }}.crt"
+
+- name: 'Fetch pulp certs'
+  fetch:
+    src: "{{ foreman_ca_directory_certs }}/{{ pulp_hostname }}.crt"
+    dest: /tmp/fetched
+
+- name: 'Fetch pulp key'
+  fetch:
+    src: "{{ foreman_ca_directory_keys }}/{{ pulp_hostname }}.key"
+    dest: /tmp/fetched
+
+- name: 'Fetch CA cert'
+  fetch:
+    src: "{{ foreman_ca_directory_certs }}/root_ca.crt"
+    dest: /tmp/fetched
+
+- name: 'Copy pulp cert'
+  copy:
+    src: "/tmp/fetched/foreman{{ foreman_ca_directory_certs }}/{{ pulp_hostname }}.crt"
+    dest: "/etc/pki/pulp/{{ pulp_hostname }}.crt"
+  delegate_to: "{{ pulp_hostname }}"
+
+- name: 'Copy pulp key'
+  copy:
+    src: "/tmp/fetched/foreman{{ foreman_ca_directory_keys }}/{{ pulp_hostname }}.key"
+    dest: "/etc/pki/pulp/{{ pulp_hostname }}.key"
+  delegate_to: "{{ pulp_hostname }}"
+
+- name: 'Copy CA cert'
+  copy:
+    src: "/tmp/fetched/foreman{{ foreman_ca_directory_certs }}/root_ca.crt"
+    dest: "/etc/pki/pulp/root_ca.crt"
+  delegate_to: "{{ pulp_hostname }}"

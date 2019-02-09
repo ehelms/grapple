@@ -1,0 +1,26 @@
+---
+- hosts: centos7
+  become: true
+  vars:
+    selinux_state: disabled
+  roles:
+    - epel_repositories
+    - selinux
+    - foreman_ca
+    - foreman_certs
+
+- hosts: centos7
+  become: true
+  vars:
+    foreman_admin_password: changeme
+    foreman_repositories_version: '1.21'
+  pre_tasks:
+    - include_vars: certs.yml
+  roles:
+    - foreman_ca
+    - foreman_certs
+    - foreman_repositories
+    - foreman_postgresql
+    - foreman
+    - foreman_apache
+    - foreman_proxy

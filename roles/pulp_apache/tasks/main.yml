@@ -1,0 +1,18 @@
+---
+- name: 'Set Apache SSL certificates'
+  lineinfile:
+    dest: /etc/httpd/conf.d/ssl.conf
+    regexp: ^SSLCertificateFile
+    line: SSLCertificateFile "/etc/pki/pulp/{{ ansible_fqdn }}.crt"
+
+- name: 'Set Apache SSL key'
+  lineinfile:
+    dest: /etc/httpd/conf.d/ssl.conf
+    regexp: ^SSLCertificateKeyFile
+    line: SSLCertificateKeyFile "/etc/pki/pulp/{{ ansible_fqdn }}.key"
+
+- name: 'Set Apache SSL CA'
+  lineinfile:
+    dest: /etc/httpd/conf.d/ssl.conf
+    regexp: SSLCACertificateFile
+    line: SSLCACertificateFile "/etc/pki/pulp/root_ca.crt"

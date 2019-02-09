@@ -1,0 +1,42 @@
+# {{ ansible_managed }}
+
+candlepin.consumer_system_name_pattern=.+
+candlepin.environment_content_filtering=true
+candlepin.auth.basic.enable=false
+candlepin.auth.trusted.enable=false
+
+# enable events via AMQP
+#candlepin.amqp.enable=true
+#candlepin.amqp.connect=tcp://{{ ansible_fqdn }}:5671?ssl='true'&ssl_cert_alias='amqp-client'
+#candlepin.amqp.keystore=/etc/candlepin/certs/amqp/candlepin.jks
+#candlepin.amqp.keystore_password=23oU7aM7Pzp75aPDzWDDXGPUVRL63QCY
+#candlepin.amqp.truststore_password=23oU7aM7Pzp75aPDzWDDXGPUVRL63QCY
+#candlepin.amqp.truststore=/etc/candlepin/certs/amqp/candlepin.truststore
+
+candlepin.auth.oauth.enable=true
+candlepin.auth.oauth.consumer.katello.secret={{ candlepin_oauth_secret }}
+
+module.config.adapter_module=org.candlepin.katello.KatelloModule
+
+candlepin.ca_key={{ foreman_ca_directory_keys }}/root_ca.key
+candlepin.ca_cert={{ foreman_ca_directory_certs }}/root_ca.crt
+candlepin.crl.file=/var/lib/candlepin/candlepin-crl.crl
+jpa.config.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+jpa.config.hibernate.connection.driver_class=org.postgresql.Driver
+jpa.config.hibernate.connection.url=jdbc:postgresql://localhost:5432/candlepin
+jpa.config.hibernate.hbm2ddl.auto=validate
+jpa.config.hibernate.connection.username={{ candlepin_postgresql_user }}
+jpa.config.hibernate.connection.password={{ candlepin_postgresql_password }}
+
+org.quartz.jobStore.misfireThreshold=60000
+org.quartz.jobStore.useProperties=false
+org.quartz.jobStore.dataSource=myDS
+org.quartz.jobStore.tablePrefix=QRTZ_
+org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX
+org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
+org.quartz.dataSource.myDS.driver=org.postgresql.Driver
+org.quartz.dataSource.myDS.URL=jdbc:postgresql://localhost:5432/candlepin
+org.quartz.dataSource.myDS.user={{ candlepin_postgresql_user }}
+org.quartz.dataSource.myDS.password={{ candlepin_postgresql_password }}
+org.quartz.dataSource.myDS.maxConnections=5
