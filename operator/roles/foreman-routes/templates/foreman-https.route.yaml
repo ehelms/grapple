@@ -1,0 +1,17 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: foreman-https
+  namespace: "{{ project_name }}"
+  labels:
+    app: httpd
+spec:
+  host: "{{ application_hostname }}"
+  to:
+    kind: Service
+    name: httpd
+  port:
+    targetPort: https
+  tls:
+    termination: passthrough

@@ -2,8 +2,8 @@ FROM centos:7
 
 RUN echo "tsflags=nodocs" >> /etc/yum.conf && \
     yum -y install epel-release \
-                   http://yum.theforeman.org/releases/1.20/el7/x86_64/foreman-release.rpm \
-                   https://fedorapeople.org/groups/katello/releases/yum/3.9/katello/el7/x86_64/katello-repos-latest.rpm && \
+                   http://yum.theforeman.org/releases/nightly/el7/x86_64/foreman-release.rpm \
+                   https://fedorapeople.org/groups/katello/releases/yum/nightly/katello/el7/x86_64/katello-repos-latest.rpm && \
     yum -y install foreman-release-scl && \
     yum -y install qpid-tools ansible && \
     yum -y install foreman tfm-rubygem-puma \

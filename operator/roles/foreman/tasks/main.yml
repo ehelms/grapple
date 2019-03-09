@@ -1,0 +1,24 @@
+---
+- name: foreman config maps
+  k8s:
+    state: "{{ deployment_state }}"
+    definition: "{{ lookup('template', 'templates/' + item + '.config-map.yaml') | from_yaml }}"
+  with_items:
+    - httpd
+
+- name: foreman service
+  k8s:
+    state: "{{ deployment_state }}"
+    definition: "{{ lookup('template', 'templates/' + item + '.service.yaml') | from_yaml }}"
+  with_items:
+    - foreman
+    - httpd
+
+- name: foreman deployment
+  k8s:
+    state: "{{ deployment_state }}"
+    definition: "{{ lookup('template', 'templates/' + item + '.deployment.yaml') | from_yaml }}"
+  with_items:
+    - foreman
+    - dynflow
+    - httpd
